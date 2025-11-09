@@ -398,5 +398,216 @@ public class CustomLocationsSimulation extends Simulation {
 ----------------------
 
 
+## Boundary box
+
+import java.util.concurrent.ThreadLocalRandom;
+
+public class BoundingBoxLocationGenerator {
+    private static final ThreadLocalRandom RANDOM = ThreadLocalRandom.current();
+    private final List<LocationProbability> cumulativeDistribution;
+    
+    public static class Coordinates {
+        private final double latitude;
+        private final double longitude;
+        public Coordinates(double latitude, double longitude) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
+        public double getLatitude() { return latitude; }
+        public double getLongitude() { return longitude; }
+    }
+    
+    public BoundingBoxLocationGenerator(List<UKLocationWithBoundingBox> locations) {
+        this.cumulativeDistribution = createCumulativeDistribution(locations);
+    }
+    
+    public Coordinates generateWeightedLocation() {
+        double randValue = RANDOM.nextDouble();
+        UKLocationWithBoundingBox selectedLocation = selectLocation(randValue);
+        return generateLocationInBoundingBox(selectedLocation);
+    }
+    
+    private Coordinates generateLocationInBoundingBox(UKLocationWithBoundingBox location) {
+        double randomLat = RANDOM.nextDouble(location.getMinLatitude(), location.getMaxLatitude());
+        double randomLon = RANDOM.nextDouble(location.getMinLongitude(), location.getMaxLongitude());
+        return new Coordinates(randomLat, randomLon);
+    }
+    
+    // ... (cumulative distribution logic same as before)
+}
+
+
+------------
+
+public class FlexibleLocationGenerator {
+    private static final ThreadLocalRandom RANDOM = ThreadLocalRandom.current();
+    private final List<LocationProbability> cumulativeDistribution;
+    
+    public FlexibleLocationGenerator(List<UKLocationFlexible> locations) {
+        this.cumulativeDistribution = createCumulativeDistribution(locations);
+    }
+    
+    public Coordinates generateWeightedLocation() {
+        double randValue = RANDOM.nextDouble();
+        UKLocationFlexible selectedLocation = selectLocation(randValue);
+        
+        if (selectedLocation.isBoundingBox()) {
+            return generateLocationInBoundingBox(selectedLocation);
+        } else if (selectedLocation.isCircular()) {
+            return generateLocationInRadius(selectedLocation);
+        } else {
+            // Fallback to exact coordinates
+            return new Coordinates(
+                selectedLocation.getCenterLatitude(),
+                selectedLocation.getCenterLongitude()
+            );
+        }
+    }
+    
+    private Coordinates generateLocationInBoundingBox(UKLocationFlexible location) {
+        double randomLat = RANDOM.nextDouble(location.getMinLatitude(), location.getMaxLatitude());
+        double randomLon = RANDOM.nextDouble(location.getMinLongitude(), location.getMaxLongitude());
+        return new Coordinates(randomLat, randomLon);
+    }
+    
+    private Coordinates generateLocationInRadius(UKLocationFlexible location) {
+        // Use the same radius-based generation as before
+        double radius = location.getRadiusKm() * 1000;
+        double distance = Math.sqrt(RANDOM.nextDouble()) * radius;
+        double bearing = RANDOM.nextDouble() * 2 * Math.PI;
+        
+        double latRad = Math.toRadians(location.getCenterLatitude());
+        double lonRad = Math.toRadians(location.getCenterLongitude());
+        double earthRadius = 6378137.0;
+        
+        double newLatRad = Math.asin(
+            Math.sin(latRad) * Math.cos(distance / earthRadius) +
+            Math.cos(latRad) * Math.sin(distance / earthRadius) * Math.cos(bearing)
+        );
+        
+        double newLonRad = lonRad + Math.atan2(
+            Math.sin(bearing) * Math.sin(distance / earthRadius) * Math.cos(latRad),
+            Math.cos(distance / earthRadius) - Math.sin(latRad) * Math.sin(newLatRad)
+        );
+        
+        return new Coordinates(Math.toDegrees(newLatRad), Math.toDegrees(newLonRad));
+    }
+}
+
+-------------------------
+
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+
+public class BoundingBoxLocationGenerator {
+    private static final ThreadLocalRandom RANDOM = ThreadLocalRandom.current();
+    private final List<LocationProbability> cumulativeDistribution;
+    
+    public static class Coordinates {
+        private final double latitude;
+        private final double longitude;
+        private final String locationName;
+        
+        public Coordinates(double latitude, double longitude, String locationName) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+            this.locationName = locationName;
+        }
+        
+        public double getLatitude() { return latitude; }
+        public double getLongitude() { return longitude; }
+        public String getLocationName() { return locationName; }
+        
+        @Override
+        public String toString() {
+            return String.format("%s (%.6f, %.6f)", locationName, latitude, longitude);
+        }
+    }
+    
+    public BoundingBoxLocationGenerator(List<UKLocationWithBoundingBox> locations) {
+        this.cumulativeDistribution = createCumulativeDistribution(locations);
+        printDistributionInfo();
+    }
+    
+    private List<LocationProbability> createCumulativeDistribution(List<UKLocationWithBoundingBox> locations) {
+        List<LocationProbability> distribution = new ArrayList<>();
+        long totalWeight = locations.stream().mapToLong(UKLocationWithBoundingBox::getWeight).sum();
+        double cumulative = 0.0;
+        
+        for (UKLocationWithBoundingBox location : locations) {
+            double proportion = (double) location.getWeight() / totalWeight;
+            cumulative += proportion;
+            distribution.add(new LocationProbability(location, cumulative));
+        }
+        
+        return distribution;
+    }
+    
+    private void printDistributionInfo() {
+        System.out.println("=== LOCATION DISTRIBUTION ===");
+        long totalWeight = cumulativeDistribution.stream()
+            .mapToLong(lp -> lp.location.getWeight())
+            .sum();
+            
+        for (LocationProbability lp : cumulativeDistribution) {
+            double percentage = (lp.location.getWeight() * 100.0) / totalWeight;
+            System.out.printf("%-20s: %3d vehicles (%5.2f%%) %s%n", 
+                lp.location.getName(),
+                lp.location.getWeight(),
+                percentage,
+                String.format("Lat[%.4f-%.4f] Lon[%.4f-%.4f]", 
+                    lp.location.getMinLatitude(), lp.location.getMaxLatitude(),
+                    lp.location.getMinLongitude(), lp.location.getMaxLongitude())
+            );
+        }
+        System.out.println("Total weight: " + totalWeight);
+        System.out.println("==============================");
+    }
+    
+    public Coordinates generateWeightedLocation() {
+        double randValue = RANDOM.nextDouble();
+        UKLocationWithBoundingBox selectedLocation = selectLocation(randValue);
+        Coordinates coords = generateLocationInBoundingBox(selectedLocation);
+        return coords;
+    }
+    
+    private UKLocationWithBoundingBox selectLocation(double randValue) {
+        for (LocationProbability lp : cumulativeDistribution) {
+            if (randValue <= lp.cumulativeProbability) {
+                return lp.location;
+            }
+        }
+        return cumulativeDistribution.get(0).location;
+    }
+    
+    private Coordinates generateLocationInBoundingBox(UKLocationWithBoundingBox location) {
+        double randomLat = RANDOM.nextDouble(location.getMinLatitude(), location.getMaxLatitude());
+        double randomLon = RANDOM.nextDouble(location.getMinLongitude(), location.getMaxLongitude());
+        return new Coordinates(randomLat, randomLon, location.getName());
+    }
+    
+    // Method to verify distribution
+    public Map<String, Integer> getDistributionSample(int sampleSize) {
+        Map<String, Integer> distribution = new HashMap<>();
+        
+        for (int i = 0; i < sampleSize; i++) {
+            Coordinates coords = generateWeightedLocation();
+            distribution.merge(coords.getLocationName(), 1, Integer::sum);
+        }
+        
+        return distribution;
+    }
+    
+    static class LocationProbability {
+        final UKLocationWithBoundingBox location;
+        final double cumulativeProbability;
+        
+        LocationProbability(UKLocationWithBoundingBox location, double cumulativeProbability) {
+            this.location = location;
+            this.cumulativeProbability = cumulativeProbability;
+        }
+    }
+}
+
 ```
 ---
