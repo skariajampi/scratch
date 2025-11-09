@@ -1,5 +1,31 @@
 # cumulative distribution
+## real populatin based weights:
 ```java
+
+
+List<UKLocation> realPopulationLocations = Arrays.asList(
+    new UKLocation("London", 51.5074, -0.1278, 9000),       // ~9 million people
+    new UKLocation("Birmingham", 52.4862, -1.8904, 1150),   // ~1.15 million
+    new UKLocation("Manchester", 53.4808, -2.2426, 550),    // ~550,000
+    new UKLocation("Glasgow", 55.8642, -4.2518, 635),       // ~635,000
+    new UKLocation("Leeds", 53.8008, -1.5491, 515),         // ~515,000
+    new UKLocation("Liverpool", 53.4084, -2.9916, 486),     // ~486,000
+    new UKLocation("Newcastle", 54.9783, -1.6178, 300),     // ~300,000
+    new UKLocation("Sheffield", 53.3811, -1.4701, 556),     // ~556,000
+    new UKLocation("Bristol", 51.4545, -2.5879, 472),       // ~472,000
+    new UKLocation("Belfast", 54.5973, -5.9301, 345),       // ~345,000
+    new UKLocation("Edinburgh", 55.9533, -3.1883, 507),     // ~507,000
+    new UKLocation("Leicester", 52.6369, -1.1398, 368),     // ~368,000
+    new UKLocation("Cardiff", 51.4816, -3.1791, 362),       // ~362,000
+    new UKLocation("Coventry", 52.4068, -1.5197, 345),      // ~345,000
+    new UKLocation("Nottingham", 52.9548, -1.1581, 331),    // ~331,000
+    new UKLocation("Southampton", 50.9097, -1.4044, 255),   // ~255,000
+    new UKLocation("Portsmouth", 50.8198, -1.0880, 249),    // ~249,000
+    new UKLocation("Brighton", 50.8225, -0.1372, 290),      // ~290,000
+    new UKLocation("Reading", 51.4543, -0.9781, 174),       // ~174,000
+    new UKLocation("Aberdeen", 57.1497, -2.0943, 198)       // ~198,000
+);
+-----------------------
 import java.util.*;
 
 public class UKLocation {
