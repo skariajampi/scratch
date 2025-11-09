@@ -2,7 +2,154 @@
 ## real populatin based weights:
 ```java
 
+import java.util.Arrays;
+import java.util.List;
 
+public class UKCityBoundingBoxes {
+    
+    public static List<UKLocationWithBoundingBox> getTop20UKCities() {
+        return Arrays.asList(
+            // 1. London - Greater London area
+            new UKLocationWithBoundingBox("London", 2700,
+                51.2868, 51.6919,   // minLat, maxLat (South to North)
+                -0.5104, 0.3340),   // minLon, maxLon (West to East)
+            
+            // 2. Birmingham - West Midlands urban area
+            new UKLocationWithBoundingBox("Birmingham", 480,
+                52.4068, 52.5463,   // minLat, maxLat
+                -2.0602, -1.7276),  // minLon, maxLon
+            
+            // 3. Manchester - Greater Manchester area
+            new UKLocationWithBoundingBox("Manchester", 320,
+                53.3811, 53.5500,   // minLat, maxLat  
+                -2.4359, -2.1500),  // minLon, maxLon
+            
+            // 4. Glasgow - Greater Glasgow area
+            new UKLocationWithBoundingBox("Glasgow", 280,
+                55.8000, 55.9500,   // minLat, maxLat
+                -4.4000, -4.1000),  // minLon, maxLon
+            
+            // 5. Leeds - West Yorkshire urban area
+            new UKLocationWithBoundingBox("Leeds", 260,
+                53.7500, 53.9000,   // minLat, maxLat
+                -1.7000, -1.4000),  // minLon, maxLon
+            
+            // 6. Liverpool - Merseyside area
+            new UKLocationWithBoundingBox("Liverpool", 240,
+                53.3500, 53.4800,   // minLat, maxLat
+                -3.0500, -2.8500),  // minLon, maxLon
+            
+            // 7. Newcastle upon Tyne - Tyneside area
+            new UKLocationWithBoundingBox("Newcastle", 150,
+                54.9300, 55.0500,   // minLat, maxLat
+                -1.7000, -1.5000),  // minLon, maxLon
+            
+            // 8. Sheffield - South Yorkshire urban area
+            new UKLocationWithBoundingBox("Sheffield", 220,
+                53.3500, 53.4300,   // minLat, maxLat
+                -1.6000, -1.4000),  // minLon, maxLon
+            
+            // 9. Bristol - Greater Bristol area
+            new UKLocationWithBoundingBox("Bristol", 210,
+                51.4000, 51.5500,   // minLat, maxLat
+                -2.7000, -2.5000),  // minLon, maxLon
+            
+            // 10. Belfast - Greater Belfast area
+            new UKLocationWithBoundingBox("Belfast", 160,
+                54.5500, 54.6500,   // minLat, maxLat
+                -6.0000, -5.8000),  // minLon, maxLon
+            
+            // 11. Edinburgh - City of Edinburgh
+            new UKLocationWithBoundingBox("Edinburgh", 180,
+                55.9000, 55.9800,   // minLat, maxLat
+                -3.3000, -3.1000),  // minLon, maxLon
+            
+            // 12. Leicester - Leicestershire urban area
+            new UKLocationWithBoundingBox("Leicester", 140,
+                52.5800, 52.6800,   // minLat, maxLat
+                -1.2000, -1.0500),  // minLon, maxLon
+            
+            // 13. Cardiff - Capital Region
+            new UKLocationWithBoundingBox("Cardiff", 150,
+                51.4500, 51.5500,   // minLat, maxLat
+                -3.3000, -3.1000),  // minLon, maxLon
+            
+            // 14. Coventry - West Midlands area
+            new UKLocationWithBoundingBox("Coventry", 120,
+                52.3700, 52.4500,   // minLat, maxLat
+                -1.6000, -1.4500),  // minLon, maxLon
+            
+            // 15. Nottingham - Nottingham urban area
+            new UKLocationWithBoundingBox("Nottingham", 130,
+                52.9000, 53.0000,   // minLat, maxLat
+                -1.2500, -1.1000),  // minLon, maxLon
+            
+            // 16. Southampton - South Hampshire area
+            new UKLocationWithBoundingBox("Southampton", 100,
+                50.8500, 50.9500,   // minLat, maxLat
+                -1.5000, -1.3000),  // minLon, maxLon
+            
+            // 17. Portsmouth - South Hampshire area
+            new UKLocationWithBoundingBox("Portsmouth", 90,
+                50.7800, 50.8600,   // minLat, maxLat
+                -1.1500, -1.0000),  // minLon, maxLon
+            
+            // 18. Brighton - Brighton and Hove area
+            new UKLocationWithBoundingBox("Brighton", 110,
+                50.8200, 50.8700,   // minLat, maxLat
+                -0.2000, -0.1000),  // minLon, maxLon
+            
+            // 19. Reading - Berkshire urban area
+            new UKLocationWithBoundingBox("Reading", 80,
+                51.4200, 51.4800,   // minLat, maxLat
+                -1.0500, -0.9000),  // minLon, maxLon
+            
+            // 20. Aberdeen - Aberdeenshire area
+            new UKLocationWithBoundingBox("Aberdeen", 70,
+                57.1200, 57.1800,   // minLat, maxLat
+                -2.1500, -2.0500)   // minLon, maxLon
+        );
+    }
+    
+    // Additional smaller towns and rural areas
+    public static List<UKLocationWithBoundingBox> getSmallerTowns() {
+        return Arrays.asList(
+            // Isle of Skye - covers most of the island
+            new UKLocationWithBoundingBox("Isle of Skye", 5,
+                57.2000, 57.5000,   // minLat, maxLat
+                -6.4000, -5.9000),  // minLon, maxLon
+            
+            // York - historic city area
+            new UKLocationWithBoundingBox("York", 40,
+                53.9400, 53.9800,   // minLat, maxLat
+                -1.1500, -1.0500),  // minLon, maxLon
+            
+            // Cambridge - city and surrounding area
+            new UKLocationWithBoundingBox("Cambridge", 35,
+                52.1700, 52.2300,   // minLat, maxLat
+                0.0800, 0.1500),    // minLon, maxLon
+            
+            // Oxford - city and surrounding area
+            new UKLocationWithBoundingBox("Oxford", 38,
+                51.7200, 51.7800,   // minLat, maxLat
+                -1.3000, -1.2000),  // minLon, maxLon
+            
+            // Norwich - Norfolk area
+            new UKLocationWithBoundingBox("Norwich", 45,
+                52.6000, 52.6800,   // minLat, maxLat
+                1.2500, 1.3500)     // minLon, maxLon
+        );
+    }
+    
+    // Combined list with all locations
+    public static List<UKLocationWithBoundingBox> getAllUKLocations() {
+        List<UKLocationWithBoundingBox> allLocations = new ArrayList<>();
+        allLocations.addAll(getTop20UKCities());
+        allLocations.addAll(getSmallerTowns());
+        return allLocations;
+    }
+}
+---------------------------
 List<UKLocation> realPopulationLocations = Arrays.asList(
     new UKLocation("London", 51.5074, -0.1278, 9000),       // ~9 million people
     new UKLocation("Birmingham", 52.4862, -1.8904, 1150),   // ~1.15 million
