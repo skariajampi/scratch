@@ -359,4 +359,49 @@ public class DistributionVerificationTest {
 
 --------------
 
+import java.util.concurrent.ThreadLocalRandom;
+
+public class CoordinateGenerator {
+    private static final ThreadLocalRandom RANDOM = ThreadLocalRandom.current();
+    
+    public static class Coordinates {
+        private final double latitude;
+        private final double longitude;
+        
+        public Coordinates(double latitude, double longitude) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
+        
+        public double getLatitude() { return latitude; }
+        public double getLongitude() { return longitude; }
+    }
+    
+    public static Coordinates generateCoordinatesInRadius(double centerLat, double centerLon, double radiusKm) {
+        if (radiusKm <= 0) {
+            // If no radius, return exact center coordinates
+            return new Coordinates(centerLat, centerLon);
+        }
+        
+        double radius = radiusKm * 1000; // Convert to meters
+        double distance = Math.sqrt(RANDOM.nextDouble()) * radius;
+        double bearing = RANDOM.nextDouble() * 2 * Math.PI;
+        
+        double latRad = Math.toRadians(centerLat);
+        double lonRad = Math.toRadians(centerLon);
+        double earthRadius = 6378137.0;
+        
+        double newLatRad = Math.asin(
+            Math.sin(latRad) * Math.cos(distance / earthRadius) +
+            Math.cos(latRad) * Math.sin(distance / earthRadius) * Math.cos(bearing)
+        );
+        
+        double newLonRad = lonRad + Math.atan2(
+            Math.sin(bearing) * Math.sin(distance / earthRadius) * Math.cos(latRad),
+            Math.cos(distance / earthRadius) - Math.sin(latRad) * Math.sin(newLatRad)
+        );
+        
+        return new Coordinates(Math.toDegrees(newLatRad), Math.toDegrees(newLonRad));
+    }
+}
 ```
