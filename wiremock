@@ -1,0 +1,3 @@
+curl -X POST http://localhost:8080/__admin/settings \
+  -H "Content-Type: application/json" \
+  -d '{"requestJournalDisabled": true}'
